@@ -27,7 +27,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("RL Agent Simulation")
 
 # Load the Trained Model
-model_path = "qlearning_model_episode_3300.keras"  # Replace with your model file
+model_path = "qlearning_model.keras"  # Replace with your model file
 model = keras.models.load_model(model_path)
 
 # Create the Environment

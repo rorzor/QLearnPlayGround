@@ -4,12 +4,16 @@ from environment import GridEnvironment
 import numpy as np
 import random
 from collections import deque
+from settings import * 
 
 class QLearningAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
         self.model = self.build_model()
+        if USE_TARGET:
+            self.target_model = self.build_model()  # Target model
+
         self.replay_buffer = deque(maxlen=2000)  # Experience replay buffer
 
 
@@ -37,6 +41,10 @@ class QLearningAgent:
 
         self.model.fit(state, target_f, epochs=1, verbose=0)
 
+    def update_target_model(self):
+        # Copy weights from main model to target model
+        self.target_model.set_weights(self.model.get_weights())
+
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.append((state, action, reward, next_state, done))
 
@@ -45,7 +53,7 @@ class QLearningAgent:
         for state, action, reward, next_state, done in minibatch:
             target = reward
             if not done:
-                target = reward + gamma * np.amax(self.model(next_state)[0].numpy())
+                target = reward + gamma * np.amax(self.target_model(next_state)[0].numpy())
 
             target_f = self.model(state).numpy()
             target_f[0][action] = target
