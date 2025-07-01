@@ -1,0 +1,12 @@
+# requirements.txt
+# Tested with Python 3.9–3.12 on Windows
+# If you have a GPU and the appropriate CUDA/cuDNN stack,
+# substitute 'tensorflow' with 'tensorflow-gpu' instead (not tested).
+
+numpy>=1.22
+
+tensorflow>=2.16          # includes tf.keras
+keras>=3.0                # standalone Keras 3, needed for .keras model load
+
+matplotlib>=3.5
+pygame>=2.4

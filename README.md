@@ -6,7 +6,7 @@ A minimalist, fully-self-contained playground that lets you train, watch and twe
 1. [Project Structure](#project-structure)
 1. [How Q-Learning Works](#how-q-learning-works)
 1. [Q-Learning in this project](#q-learning-in-this-project)
-1. License
+1. [License](#licence)
 1. [TODO](#todo)
 ---
 
