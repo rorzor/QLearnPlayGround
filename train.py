@@ -1,14 +1,8 @@
 from environment import GridEnvironment
 from agent import QLearningAgent
-import pickle
 import matplotlib.pyplot as plt
 import time
 from settings import *
-
-
-# def normalise(reward):
-#     norm_reward = (reward + 1250) / (100 + 1250)
-#     return norm_reward
 
 def shuffle_in(value, lst):
     if len(lst) > 0:
@@ -21,13 +15,11 @@ def train_agent(episodes=10000,
                 epsilon=1.0,
                 epsilon_decay=0.9995,
                 epsilon_min=0.2,
-                replay_interval=REPLAY_INTERVAL,
                 save_interval=20,
                 max_moves=50,
                 moving_average=50):
     env = GridEnvironment()
     agent = QLearningAgent(state_size=env.get_flattened_state().shape[1], action_size=4)
-    game_evolution = []  # List to store the board states for visualization
     avg_rewards = []
     rewards = []
 
@@ -57,12 +49,14 @@ def train_agent(episodes=10000,
         move_count = 0  # Initialize move counter
 
         while not done:
-            action = agent.act(state, epsilon)
-            next_state, reward, done = env.step(action)
-            next_state = next_state.reshape(1, -1)
+            # run through the episode
+            action = agent.act(state, epsilon)  # Choose action based on epsilon-greedy policy
+            # print(f"Episode {e+1}, Action: {action}, State: {state}")
+            next_state, reward, done = env.step(action) # Take action in the environment
+            next_state = next_state.reshape(1, -1) 
 
-            agent.remember(state, action, reward, next_state, done)
-            agent.train(state, action, reward, next_state, done, gamma)
+            agent.remember(state, action, reward, next_state, done)     # Store the experience in replay buffer
+            agent.train(state, action, reward, next_state, done, gamma) # Train the agent with the experience
 
             state = next_state
             total_reward += reward
@@ -70,6 +64,7 @@ def train_agent(episodes=10000,
 
             # Handle data and reset at end of episode
             if done or move_count >= max_moves:
+                # print("Episode finished or max moves reached. Updating plot...")
                 if len(avg_rewards) < moving_average:
                     avg_rewards.append(total_reward)
                 else:
@@ -95,14 +90,14 @@ def train_agent(episodes=10000,
                 break
 
         # train through a replay after each episode
-        if len(agent.replay_buffer) > BATCH_SIZE:
+        if len(agent.replay_buffer) > BATCH_MULTIPLIER * BATCH_SIZE and (e + 1) % REPLAY_INTERVAL == 0:
+            print(f"Training agent with replay buffer size: {len(agent.replay_buffer)}")
             agent.replay(BATCH_SIZE, gamma)
 
-        # Update target model every N episodes if using a target model
-        if USE_TARGET:
-            if (e + 1) % TARGET_UPDATE_INTERVAL == 0:
-                agent.update_target_model()
-                print(f"Target model updated at episode {e+1}")
+        # Update target model every N episodes
+        if (e + 1) % TARGET_UPDATE_INTERVAL == 0:
+            agent.update_target_model()
+            print(f"Target model updated at episode {e+1}")
 
         # Store the episode evolution every 10 episodes
         if (e + 1) % save_interval == 0:

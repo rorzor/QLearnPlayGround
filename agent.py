@@ -11,16 +11,15 @@ class QLearningAgent:
         self.state_size = state_size
         self.action_size = action_size
         self.model = self.build_model()
-        if USE_TARGET:
-            self.target_model = self.build_model()  # Target model
+        self.target_model = self.build_model()  # Target model
 
         self.replay_buffer = deque(maxlen=2000)  # Experience replay buffer
 
 
     def build_model(self):
         model = models.Sequential()
-        model.add(layers.Dense(100, input_dim=self.state_size, activation='relu'))
-        model.add(layers.Dense(50, activation='relu'))
+        model.add(layers.Dense(HIDDEN_LAYER_1_SIZE, input_dim=self.state_size, activation='relu'))
+        model.add(layers.Dense(HIDDEN_LAYER_2_SIZE, activation='relu'))
         model.add(layers.Dense(self.action_size, activation='linear'))
         model.compile(optimizer=optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
         return model
